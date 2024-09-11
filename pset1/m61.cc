@@ -7,6 +7,19 @@
 #include <cassert>
 #include <sys/mman.h>
 
+// Global variables:
+static m61_statistics gstats = {
+    .nactive = 0,
+    .active_size = 0,
+    .ntotal = 0,
+    .total_size = 0,
+    .nfail = 0,
+    .fail_size = 0,
+    .heap_min = 0,
+    .heap_max = 0
+};
+
+
 
 struct m61_memory_buffer {
     char* buffer;
@@ -48,9 +61,15 @@ void* m61_malloc(size_t sz, const char* file, int line) {
     // Your code here.
     if (default_buffer.pos + sz > default_buffer.size) {
         // Not enough space left in default buffer for allocation
+        ++gstats.nfail;
+        gstats.fail_size += sz;
         return nullptr;
     }
 
+    ++gstats.ntotal;
+    ++gstats.nactive;
+    gstats.total_size += sz;
+    gstats.active_size += sz;
     // Otherwise there is enough space; claim the next `sz` bytes
     void* ptr = &default_buffer.buffer[default_buffer.pos];
     default_buffer.pos += sz;
@@ -68,6 +87,12 @@ void m61_free(void* ptr, const char* file, int line) {
     // avoid uninitialized variable warnings
     (void) ptr, (void) file, (void) line;
     // Your code here. The handout code does nothing!
+    if (ptr != nullptr) {
+        --gstats.nactive;
+        --gstats.active_size;
+        --default_buffer.pos;
+    }
+
 }
 
 
@@ -94,9 +119,16 @@ void* m61_calloc(size_t count, size_t sz, const char* file, int line) {
 m61_statistics m61_get_statistics() {
     // Your code here.
     // The handout code sets all statistics to enormous numbers.
-    m61_statistics stats;
-    memset(&stats, 255, sizeof(m61_statistics));
-    return stats;
+    // m61_statistics stats;
+    // stats.nactive = nactive;
+    // stats.active_size = active_size;
+    // stats.ntotal = ntotal;
+    // stats.total_size = total_size;
+    // stats.nfail = nfail;
+    // stats.fail_size = fail_size;
+    // stats.heap_min = 0;
+    // stats.heap_max = 0;
+    return gstats;
 }
 
 

@@ -3,7 +3,7 @@ Author and collaborators
 
 Student
 -------
-(Your name.)
+Jonathan Waldorf
 
 
 Collaborators
@@ -11,6 +11,7 @@ Collaborators
 (List any other collaborators and describe help you got from other students
 in the class.)
 
+William Gao
 
 Citations
 ---------
